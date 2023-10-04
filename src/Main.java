@@ -1,128 +1,61 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Arrays;
-import java.util.Random;
-import java.util.Scanner;
-
 public class Main {
-    public static double step = 0.5;
-    private static double toInput(String s){
-        switch (s){
-            case "темные", "да": return 1.;
-            case "светлые", "нет": return 0.;
-        }
-        return 0;
+    static final double eps = 1e-3;
+    static final double par = 3;
+    static double func(double x){
+        return Math.sin(x) * Math.exp(-par *x) / Math.pow(x,3./2);
     }
-    public static void print(double[][] W){
-        for (double[] row : W) {
-            for (double el : row) {
-                System.out.print(el + ", ");
-            }
-            System.out.println();
-        }
+    static double taylorFunc(double x){
+        return (1 - x * x / 6 + Math.pow(x, 4) / 120) * (1 - par * x * (1 - par * x / 2)) / Math.sqrt(x);
     }
-    public static void random_fill(double[][] W){
-        Random rand = new Random();
-        for (int i = 0; i < W.length; i++) {
-            for (int j = 0; j < W[i].length; j++) {
-                W[i][j] = rand.nextDouble(1.);
-            }
-        }
+    static double intTaylorFunc(double a){
+        return Math.sqrt(a) * (26 * Math.pow(a, 4) / 105 - 11 * a * a / 15 + 2);
     }
-    public static double f(double x){
-        return 1./(1 + Math.exp(-x));
-    }
-    private static void calc_out(double[] input, double[][] W, double[] output) {
-        for (int j = 0; j < W[0].length; j++){
-            for (int i = 0; i < W.length; i++) {
-                output[j] += W[i][j] * input[i];
-            }
-            output[j] = f(output[j]);
+    static double intSimpson(double a, double b, double step){
+        int n = (int) ((b - a) / step / 2);
+        double[] f = new double[n];
+        double t = a;
+        for (int i = 0; i < n; i++) {
+            f[i] = func(t);
+            t += step;
         }
-    }
-    public static double[] step(double[] input, double[][] W){
-        double[] output = new double[W[0].length + 1];
-        calc_out(input, W, output);
-        output[W[0].length] = 1;
-        return output;
-    }
-    public static double[] f_step(double[] input, double[][] W){
-        double[] output = new double[W[0].length];
-        calc_out(input, W, output);
-        return output;
-    }
-    public static double back_propagation(double[][] W, double[][] V, double[][] input, double[] answers){
-        double[] outputL = new double[100];
-        double err = 0;
-        double[][] outputJ = new double[100][10];
-        for (int i = 0; i < 100; i++){
-            outputJ[i] = step(input[i], W);
-            outputL[i] = f_step(outputJ[i], V)[0];
-            err += 0.5 * (outputL[i] - answers[i]) * (outputL[i] - answers[i]);
+        double s = 0;
+        for (int i = 0; i < n-2; i++) {
+            s += f[i] + 4 * f[i+1] + f[i+2];
         }
-        /*System.out.println(outputL[0]);*/
-        double[] deltaLast = new double[10];
-        double[][] deltaIJ = new double[4][10];
-        for (int n = 0; n < 100; n++) {
-            for (int j = 0; j < 10; j++) {
-                deltaLast[j] += (outputL[n] - answers[n]) * (1 - outputL[n]) * outputL[n] * outputJ[n][j];
-            }
-            for (int i = 0; i < 4; i++) {
-                for (int j = 0; j < 9; j++) {
-                    deltaIJ[i][j] += (outputL[n] - answers[n]) * (1 - outputL[n]) * outputL[n] * V[j][0] * outputJ[n][j] * (1 - outputJ[n][j]) * input[n][i];
-                }
-            }
-        }
-        for (int j = 0; j < 9; j++) {
-            V[j][0] -= step * deltaLast[j];
-            for (int i = 0; i < 4; i++) {
-                W[i][j] -= step * deltaIJ[i][j];
-            }
-        }
-        V[9][0] -= step * deltaLast[9];
-        return err;
+        return  s * step / 6;
     }
-    public static void net_test(double[][] W, double[][] V) throws FileNotFoundException {
-        Scanner sc = new Scanner(new File("C:\\Users\\User\\IdeaProjects\\Inf_tech\\Test.txt"));
-        double[][] input = new double[10][4];
-        for (int i = 0; i < 10; i++){
-            input[i][0] = toInput(sc.next());
-            input[i][1] = (sc.nextDouble() - 19) / 31;
-            input[i][2] = (sc.nextDouble() - 2) / 3;
-            input[i][3] = (sc.nextDouble() - 21) / 277;
-            sc.nextLine();
-            System.out.println(f_step(step(input[i], W), V)[0]);
+    public static void main(String[] args){
+        double a = 0.2;
+        double b = 1.4;
+        double c = 1000;
+        double step = 1e-6;
+        double rStep = 1e-2;
+        double t = intTaylorFunc(a);
+        while (true){
+           if (Math.abs(t - intTaylorFunc(a/2)) < eps)
+               break;
+           a /= 2;
+           t = intTaylorFunc(a);
+//           System.out.println(t + ", " + a);
         }
-    }
-
-    public static void main(String[] args) throws FileNotFoundException {
-        Scanner sc = new Scanner(new File("C:\\Users\\User\\IdeaProjects\\Inf_tech\\Learn.txt"));
-        double[][] W = new double[4][9];
-        random_fill(W);
-        double[][] V = new double[10][1];
-        random_fill(V);
-        print(W);
-        print(V);
-        /*int ageMax = 50; int ageMin = 19;
-        double markMax = 4.9; double markMin = 2.;
-        int salaryMax = 298; int salaryMin = 21;*/
-        double[][] input = new double[100][4];
-        double[] answers = new double[100];
-        for (int i = 0; i < 100; i++){
-            input[i][0] = toInput(sc.next());
-            input[i][1] = (sc.nextDouble() - 19) / 31;
-            input[i][2] = (sc.nextDouble() - 2) / 3;
-            input[i][3] = (sc.nextDouble() - 21) / 277;
-            answers[i] = toInput(sc.next());
-            sc.nextLine();
-        }
-        while(true){
-            if (back_propagation(W, V, input, answers) < 1)
+        t = intSimpson(a, b, step);
+        while (true){
+            if (Math.abs(t - intSimpson(a, b * 2, step)) < eps)
                 break;
+            b *= 2;
+            t = intSimpson(a, b, step);
+//            System.out.println(t + ", " + b);
         }
-        for (int i = 0; i < 10; i++) {
-            System.out.println(Arrays.toString(f_step(step(input[i], W), V)));
+        t = intSimpson(b, c, rStep);
+        while (true){
+            if (Math.abs(t - intSimpson(b, c * 2, rStep)) < eps)
+                break;
+            c *= 2;
+            t = intSimpson(b, c, rStep);
+//            System.out.println(t + ", " + b);
         }
-        net_test(W, V);
+        double result = intTaylorFunc(a) + intSimpson(a, b, step) + intSimpson(b, c, rStep);
+        System.out.println("my result   = " + result);
+        System.out.println("true result = 1.009762650");
     }
 }
