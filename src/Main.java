@@ -1,61 +1,59 @@
+import java.util.Arrays;
+
 public class Main {
-    static final double eps = 1e-3;
-    static final double par = 3;
-    static double func(double x){
-        return Math.sin(x) * Math.exp(-par *x) / Math.pow(x,3./2);
+    public static final double PI = 3.1415926535;
+    public static int n = 3000;
+    public static double d = 2 * PI / (n-1);
+    public static double[] x = new double[n+2];
+    public static double a(double x){
+        return Math.sin(x);
     }
-    static double taylorFunc(double x){
-        return (1 - x * x / 6 + Math.pow(x, 4) / 120) * (1 - par * x * (1 - par * x / 2)) / Math.sqrt(x);
+    public static double b(double x){
+        return Math.sin(x) + 3 * Math.sin(3 * x);
     }
-    static double intTaylorFunc(double a){
-        return Math.sqrt(a) * (26 * Math.pow(a, 4) / 105 - 11 * a * a / 15 + 2);
+    public static double f_i(double f_i_2, double f_i_1, double a_i_1, double b_i_1){
+        return 2 * f_i_1 - a_i_1 * f_i_1 * d * d - f_i_2 + b_i_1;
     }
-    static double intSimpson(double a, double b, double step){
-        int n = (int) ((b - a) / step / 2);
-        double[] f = new double[n];
-        double t = a;
-        for (int i = 0; i < n; i++) {
-            f[i] = func(t);
-            t += step;
-        }
-        double s = 0;
-        for (int i = 0; i < n-2; i++) {
-            s += f[i] + 4 * f[i+1] + f[i+2];
-        }
-        return  s * step / 6;
+    public static double f(double el, double[] res){
+        int n = Arrays.binarySearch(x, el);
+        if (n >= 0)
+            return res[n];
+        else return (1 - n - el) * res[-n] + (el + n) * res[1-n];
     }
     public static void main(String[] args){
-        double a = 0.2;
-        double b = 1.4;
-        double c = 1000;
-        double step = 1e-6;
-        double rStep = 1e-2;
-        double t = intTaylorFunc(a);
-        while (true){
-           if (Math.abs(t - intTaylorFunc(a/2)) < eps)
-               break;
-           a /= 2;
-           t = intTaylorFunc(a);
-//           System.out.println(t + ", " + a);
+        double[] a = new double[n+2];
+        double[] b = new double[n+2];
+        for (int i = 0; i < n+2; i++){
+            x[i] = d * (i-1);
+            a[i] = a(x[i]);
+            b[i] = b(x[i]);
         }
-        t = intSimpson(a, b, step);
-        while (true){
-            if (Math.abs(t - intSimpson(a, b * 2, step)) < eps)
-                break;
-            b *= 2;
-            t = intSimpson(a, b, step);
-//            System.out.println(t + ", " + b);
+        double[] f_1 = new double[n+2];
+        double[] f_2 = new double[n+2];
+        double[] f_part = new double[n+2];
+        f_1[0] = 0; f_1[1] = d;
+        f_2[0] = d; f_2[1] = 0;
+        f_part[0] = 0; f_part[1] = d;
+        for (int i = 2; i < n+2; i++){
+            f_1[i] = f_i(f_1[i-2], f_1[i-1], a[i-1], 0);
+            f_2[i] = f_i(f_2[i-2], f_2[i-1], a[i-1], 0);
+            f_part[i] = f_i(f_part[i-2], f_part[i-1], a[i-1], b[i-1]);
         }
-        t = intSimpson(b, c, rStep);
-        while (true){
-            if (Math.abs(t - intSimpson(b, c * 2, rStep)) < eps)
-                break;
-            c *= 2;
-            t = intSimpson(b, c, rStep);
-//            System.out.println(t + ", " + b);
+        double k = f_1[1] - f_1[n];
+        double l = f_2[1] - f_2[n];
+        double m = f_part[n] - f_part[1];
+        double c = f_1[2] - f_1[n+1];
+        double e = f_2[2] - f_2[n+1];
+        double f = f_part[n+1] - f_part[2];
+        double c2 = (f - c*m/k) / (e - c*l/k);
+        double c1 = (m - l*c2) / k;
+
+        double[] f_res = new double[n+2];
+        for (int i = 0; i < n + 2; i++) {
+            f_res[i] = c1 * f_1[i] + c2 * f_2[i] + f_part[i];
         }
-        double result = intTaylorFunc(a) + intSimpson(a, b, step) + intSimpson(b, c, rStep);
-        System.out.println("my result   = " + result);
-        System.out.println("true result = 1.009762650");
+        System.out.println(f_res[0]);
+        System.out.println(f(1, f_res));
+        System.out.println(f(2, f_res));
     }
 }
