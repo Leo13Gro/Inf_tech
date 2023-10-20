@@ -23,8 +23,9 @@ public class Main {
             return res[n];
         }
         else {
+            int ind = - n - 1;
 //            System.out.println(x[1-n]);
-            return ((x[1-n] - el) * res[-n] + (el - x[-n]) * res[1-n]) / (x[1-n] + x[-n]);
+            return res[ind-1] + (res[ind] - res[ind-1]) / (x[ind] - x[ind-1]) * (el - x[ind-1]);
         }
     }
     public static void main(String[] args){
@@ -73,14 +74,14 @@ public class Main {
         for (int i = 0; i < n + 2; i++) {
             f_res[i] = c1 * f_1[i] + c2 * f_2[i] + f_part[i];
         }
-        System.out.println(f(0, f_res));
-        System.out.println(f(PI/6, f_res) - f(0, f_res));
-        System.out.println(f(PI/3, f_res) - f(0, f_res));
-        System.out.println(f(PI/2, f_res) - f(0, f_res));
-        System.out.println(f(PI, f_res) - f(0, f_res));
-        System.out.println(f(3*PI/2, f_res) - f(0, f_res));
-        System.out.println(f_res[1] + " " + f_res[n]);
-        System.out.println(f_res[2] + " " + f_res[n+1]);
+//        System.out.println(f(0, f_res));
+//        System.out.println(f(PI/6, f_res) - f(0, f_res));
+//        System.out.println(f(PI/3, f_res) - f(0, f_res));
+//        System.out.println(f(PI/2, f_res) - f(0, f_res));
+//        System.out.println(f(PI, f_res) - f(0, f_res));
+//        System.out.println(f(3*PI/2, f_res) - f(0, f_res));
+//        System.out.println(f_res[1] + " " + f_res[n]);
+//        System.out.println(f_res[2] + " " + f_res[n+1]);
         System.out.println("f(1) = " + f(1, f_res));
         System.out.println("f(2) = " + f(2, f_res));
     }
