@@ -1,44 +1,35 @@
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.util.*;
 
 public class Main {
-    static PrintWriter printWriter;
-    public static final double dt = 1e-2;
-    public static final int n = 2000;
-    public static double f1(double x, double y){
-        return (1 - y) * x;
+    public static int diff(char c1, char c2){
+        if (c1 == c2)
+            return 0;
+        return 1;
     }
-    public static double f2(double x, double y){
-        return (-1 + 2 * x) * y;
+    public static int min(int a, int b, int c){
+        int temp = Math.min(a, b);
+        return Math.min(temp, c);
     }
-    public static void writeGraph(int k) throws FileNotFoundException {
-        double[] x = new double[n];
-        double[] y = new double[n];
-        double t = 0;
-        x[0] = (4 + k) / 10.;
-        y[0] = 1;
-        for (int i = 1; i < n; i++) {
-            x[i] = x[i-1] + f1(x[i-1], y[i-1]) * dt;
-            y[i] = y[i-1] + f2(x[i-1], y[i-1]) * dt;
-            t = t + dt;
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        char[] str_1 = sc.nextLine().toCharArray();
+        char[] str_2 = sc.nextLine().toCharArray();
+        int n = str_1.length;
+        int m = str_2.length;
+        int [][] D = new int[n+1][m+1];
+        for (int i = 0; i <= n; i++) {
+            D[i][0] = i;
         }
-        printWriter.print("x" + k + " = [");
-        for (int i = 0; i < n - 1; i++) {
-            printWriter.print(x[i] + ",");
+        for (int j = 0; j <= m; j++) {
+            D[0][j] = j;
         }
-        printWriter.print(x[n-1] + "]");
-        printWriter.print("\ny" + k + " = [");
-        for (int i = 0; i < n - 1; i++) {
-            printWriter.print(y[i] + ",");
+        int t;
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= m; j++) {
+                t = diff(str_1[i-1], str_2[j-1]);
+                D[i][j] = min(D[i-1][j] + 1, D[i][j-1] + 1, D[i-1][j-1] + t);
+            }
         }
-        printWriter.print(y[n-1] + "]");
-        printWriter.println("\n");
-    }
-    public static void main(String[] args) throws FileNotFoundException {
-        printWriter = new PrintWriter("C:\\Users\\User\\IdeaProjects\\Inf_tech\\Graph.txt");
-        for (int i = 1; i < 11; i++) {
-            writeGraph(i);
-        }
-        printWriter.close();
+        System.out.println(D[n][m]);
     }
 }
