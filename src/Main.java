@@ -1,21 +1,39 @@
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
-    public static final int e = 17;
-    public static final int n = 77;
-    public static final int d = 53;
     public static void main(String[] args){
         Scanner sc = new Scanner(System.in);
-        int m = sc.nextInt();
-        int c = 1;
-        for (int i = 0; i < e; i++) {
-            c = (c * m) % n;
+        String[] AInput = sc.nextLine().split("; ");
+        String[] BInput = sc.nextLine().split("; ");
+        int k = sc.nextInt();
+        int l = sc.nextInt();
+
+        int[] tA;
+        int[] tB;
+        for (String sA : AInput) {
+            for (String sB : BInput) {
+                tA = Arrays.stream(sA.split(" ")).mapToInt(Integer::parseInt).toArray();
+                tB = Arrays.stream(sB.split(" ")).mapToInt(Integer::parseInt).toArray();
+                if (k == tA[0] && l == tB[0] && tA[1] == tB[1])
+                    System.out.println(tA[2] * tB[2]);
+            }
         }
-        System.out.println("c = " + c);
-        int res = 1;
-        for (int i = 0; i < d; i++) {
-            res = (res * c) % n;
+        /*int[][] A = new int[1000][1000];
+        int[][] B = new int[1000][1000];
+        String[] t;
+        for (String s : AInput) {
+            t = s.split(" ");
+            A[Integer.parseInt(t[0])][Integer.parseInt(t[1])] = Integer.parseInt(t[2]);
         }
-        System.out.println("m = " + res);
+        for (String s : BInput) {
+            t = s.split(" ");
+            B[Integer.parseInt(t[0])][Integer.parseInt(t[1])] = Integer.parseInt(t[2]);
+        }
+        int res = 0;
+        for (int i = 0; i < 1000; i++) {
+            res += A[k][i] * B[i][l];
+        }
+        System.out.println(res);*/
     }
 }
