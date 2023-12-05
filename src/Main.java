@@ -11,14 +11,16 @@ public class Main {
 
         int[] tA;
         int[] tB;
+        int res = 0;
         for (String sA : AInput) {
             for (String sB : BInput) {
                 tA = Arrays.stream(sA.split(" ")).mapToInt(Integer::parseInt).toArray();
                 tB = Arrays.stream(sB.split(" ")).mapToInt(Integer::parseInt).toArray();
-                if (k == tA[0] && l == tB[0] && tA[1] == tB[1])
-                    System.out.println(tA[2] * tB[2]);
+                if (k == tA[0] && l == tB[1] && tA[1] == tB[0])
+                    res += tA[2] * tB[2];
             }
         }
+        System.out.println(res);
         /*int[][] A = new int[1000][1000];
         int[][] B = new int[1000][1000];
         String[] t;
