@@ -1,39 +1,40 @@
-import java.util.Arrays;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args){
-        Scanner sc = new Scanner(System.in);
-        String[] AInput = sc.nextLine().split("; ");
-        String[] BInput = sc.nextLine().split("; ");
-        int k = sc.nextInt();
-        int l = sc.nextInt();
+    public static void main(String[] args) throws FileNotFoundException {
+        Scanner sc = new Scanner(new File("C:\\Users\\User\\IdeaProjects\\Inf_tech\\src\\input.txt"));
+        String[] input = sc.nextLine().split(" ");
+        int[] intInput = new int[input.length];
+        int inputLength = 0;
+        long A = 0;
+        long B = 0;
+        for (int i = 0; i < input.length; i++) {
+            inputLength += input[i].length();
+            intInput[i] =  Integer.parseInt(input[i]);
+        }
+        for (int i = 0; i < intInput.length-1; i++) {
+            A += (long) intInput[i] * intInput[i+1];
+            B += (long) intInput[i] * intInput[i];
+        }
+        float c1 = (float) A / B;
+        StringBuilder res = new StringBuilder();
+        int outputLength = 0;
+        String t = String.format("%.2f",c1);
+        outputLength += t.length();
+        res.append(t).append(" ");
+        res.append(intInput[0]).append(" ");
+        outputLength += input[0].length();
+        for (int i = 1; i < intInput.length; i++) {
+            t = String.format("%.0f", intInput[i] - c1 * intInput[i - 1]);
+            res.append(t).append(" ");
+            outputLength += t.length();
+        }
+        System.out.println(res);
+        System.out.println(inputLength);
+        System.out.println(outputLength);
+        System.out.println("k = " + (float) inputLength / outputLength);
 
-        int[] tA;
-        int[] tB;
-        for (String sA : AInput) {
-            for (String sB : BInput) {
-                tA = Arrays.stream(sA.split(" ")).mapToInt(Integer::parseInt).toArray();
-                tB = Arrays.stream(sB.split(" ")).mapToInt(Integer::parseInt).toArray();
-                if (k == tA[0] && l == tB[0] && tA[1] == tB[1])
-                    System.out.println(tA[2] * tB[2]);
-            }
-        }
-        /*int[][] A = new int[1000][1000];
-        int[][] B = new int[1000][1000];
-        String[] t;
-        for (String s : AInput) {
-            t = s.split(" ");
-            A[Integer.parseInt(t[0])][Integer.parseInt(t[1])] = Integer.parseInt(t[2]);
-        }
-        for (String s : BInput) {
-            t = s.split(" ");
-            B[Integer.parseInt(t[0])][Integer.parseInt(t[1])] = Integer.parseInt(t[2]);
-        }
-        int res = 0;
-        for (int i = 0; i < 1000; i++) {
-            res += A[k][i] * B[i][l];
-        }
-        System.out.println(res);*/
     }
 }
